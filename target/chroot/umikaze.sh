@@ -78,6 +78,11 @@ git_clone_full () {
 	echo "${git_target_dir} : ${git_repo}" >> /opt/source/list.txt
 }
 
+wget_and_untar () {
+    wget -qO- ${src_url} | tar xvz -C ${target_dir}
+    echo "${target_dir} : ${src_url}" >> /opt/source/list.txt
+}
+
 setup_system () {
 	echo "" >> /etc/securetty
 	echo "#USB Gadget Serial Port" >> /etc/securetty
@@ -100,24 +105,26 @@ install_redeem_deb_pkgs () {
 
 install_redeem_src_pkgs () {
     echo "Log: (umikaze): installing redeem src packages"
+    src_url="https://git.ti.com/pru-software-support-package/pru-software-support-package/archive-tarball/v5.1.0"
+    target_dir="/usr/src/"
+    wget_and_untar
 
-	wget --no-check-certificate https://git.ti.com/pru-software-support-package/pru-software-support-package/archive-tarball/v5.1.0
-	mv v5.1.0 v5.1.0.tar.gz
-	tar -zxvf v5.1.0.tar.gz
-	mv pru-software-support-package-pru-software-support-package/ /usr/src/pru-software-support-package
-	rm v5.1.0.tar.gz
 
 	wget https://github.com/beagleboard/am335x_pru_package/archive/master.zip
 	unzip master.zip
+
 	# install pasm PRU compiler
 	mkdir /usr/include/pruss
 	cd am335x_pru_package-master/
 	cp pru_sw/app_loader/include/prussdrv.h /usr/include/pruss/
 	cp pru_sw/app_loader/include/pruss_intc_mapping.h /usr/include/pruss
+
 	chmod 555 /usr/include/pruss/*
 	cd pru_sw/app_loader/interface
+
 	CROSS_COMPILE= make
 	cp ../lib/* /usr/lib
+
 	ldconfig
 	cd ../../utils/pasm_source/
 	source linuxbuild
