@@ -85,7 +85,8 @@ setup_system () {
 }
 
 install_redeem_deb_pkgs () {
-    echo "** Install dependencies **"
+
+    echo "Log: (umikaze): installing redeem lib dependencies"
 	apt-get update
 	echo "APT::Install-Recommends \"false\";" > /etc/apt/apt.conf.d/99local
 	echo "APT::Install-Suggests \"false\";" >> /etc/apt/apt.conf.d/99local
@@ -98,6 +99,8 @@ install_redeem_deb_pkgs () {
 }
 
 install_redeem_src_pkgs () {
+    echo "Log: (umikaze): installing redeem src packages"
+
 	wget --no-check-certificate https://git.ti.com/pru-software-support-package/pru-software-support-package/archive-tarball/v5.1.0
 	mv v5.1.0 v5.1.0.tar.gz
 	tar -zxvf v5.1.0.tar.gz
@@ -123,11 +126,12 @@ install_redeem_src_pkgs () {
 }
 
 install_redeem_pip_pkgs () {
-
+    echo "Log: (umikaze): installing redeem pip packages"
 }
 
 
 install_redeem () {
+    echo "Log: (umikaze): installing redeem"
     install_redeem_deb_pkgs
     install_redeem_src_pkgs
     install_redeem_pip_pkgs
