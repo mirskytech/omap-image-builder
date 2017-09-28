@@ -105,7 +105,7 @@ install_redeem_deb_pkgs () {
 
 install_redeem_src_pkgs () {
     echo "Log: (umikaze): installing redeem src packages"
-    src_url="https://git.ti.com/pru-software-support-package/pru-software-support-package/archive-tarball/v5.1.0"
+    src_url="http://git.ti.com/pru-software-support-package/pru-software-support-package/archive-tarball/v5.1.0"
     target_dir="/usr/src/"
     wget_and_untar
 
