@@ -100,7 +100,8 @@ install_redeem_deb_pkgs () {
 	python-setuptools \
 	python-dev \
 	swig \
-	socat
+	socat \
+	ti-pru-cgt-installer
 }
 
 install_redeem_src_pkgs () {
@@ -134,14 +135,28 @@ install_redeem_src_pkgs () {
 
 install_redeem_pip_pkgs () {
     echo "Log: (umikaze): installing redeem pip packages"
+    pip install numpy evdev spidev Adafruit_BBIO sympy
 }
 
-
 install_redeem () {
-    echo "Log: (umikaze): installing redeem"
     install_redeem_deb_pkgs
     install_redeem_src_pkgs
     install_redeem_pip_pkgs
+
+    echo "Log: (umikaze): installing redeem"
+    cd /usr/src/
+	if [ ! -d "redeem" ]; then
+		git clone --no-single-branch --depth 1 https://bitbucket.org/intelligentagent/redeem
+	fi
+	cd redeem
+	git pull
+    git checkout staging
+	make install
+
+	# Make profiles uploadable via Octoprint
+	cp -r configs /etc/redeem
+	cp -r data /etc/redeem
+	touch /etc/redeem/local.cfg
 }
 
 install_git_repos () {
@@ -164,12 +179,62 @@ install_git_repos () {
 	git_clone
 }
 
+configure_cpufrequtils () {
+	echo "GOVERNOR=\"performance\"" > /etc/default/cpufrequtils
+	systemctl stop ondemand
+	systemctl disable ondemand
+}
+
+install_replicape_dts () {
+
+    # disable any loading of default or universal cape managers on boot
+    sed -i "s/cape_universal=enable/consoleblank=0 fbcon=rotate:1 omap_wdt.nowayout=0/" /boot/uEnv.txt
+
+    # enable PRU access overlay's i/o
+	sed -i 's\uboot_overlay_pru=/lib/firmware/AM335X-PRU-RPROC\#uboot_overlay_pru=/lib/firmware/AM335X-PRU-RPROC\' /boot/uEnv.txt
+	sed -i 's\#uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO\uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO\' /boot/uEnv.txt
+
+	echo "Log: (umikaze) install replicape overlays"
+	git_repo="https://github.com/ThatWileyGuy/bb.org-overlays"
+	git_target_dir="/usr/src"
+	git_clone
+
+	cd /usr/src/bb.org-overlays
+	./dtc-overlay.sh # upgrade DTC version!
+	./install.sh
+
+	for kernel in `ls /lib/modules`; do update-initramfs -u -k $kernel; done
+
+}
+
+install_nmtui () {
+
+	echo "Log: (umikaze) disable wireless power management"
+	mkdir -p /etc/pm/sleep.d
+	touch /etc/pm/sleep.d/wireless
+
+	echo "Log: (umikaze) install network manager"
+	apt-get -y install --no-install-recommends network-manager
+	#ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
+	sed -i 's/^\[main\]/\[main\]\ndhcp=internal/' /etc/NetworkManager/NetworkManager.conf
+	cp $WD/interfaces /etc/network/
+
+}
+
+cleanup() {
+	echo "Log: (umikaze) cleanup"*
+	rm -rf /etc/apache2/sites-enabled
+	rm -rf /root/.c9
+	rm -rf /usr/local/lib/node_modules
+	rm -rf /var/lib/cloud9
+	rm -rf /usr/lib/node_modules/
+	apt-get purge -y apache2 apache2-bin apache2-data apache2-utils hostapd connman
+}
+
 
 is_this_qemu
 
 setup_system
-
-#install_pip_pkgs
 
 if [ -f /usr/bin/git ] ; then
 	git config --global user.email "${rfs_username}@example.com"
@@ -180,8 +245,9 @@ if [ -f /usr/bin/git ] ; then
 fi
 
 install_redeem
+configure_cpufrequtils
+install_replicape_dts
 
-#install_build_pkgs
-#other_source_links
-#unsecure_root
-#todo
+
+apt-get autoremove -y
+
