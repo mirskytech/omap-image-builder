@@ -105,15 +105,16 @@ install_redeem_deb_pkgs () {
 }
 
 install_redeem_src_pkgs () {
-    echo "Log: (umikaze): installing redeem src packages"
+    echo "Log: (umikaze): pru support"
     src_url="http://git.ti.com/pru-software-support-package/pru-software-support-package/archive-tarball/v5.1.0"
     target_dir="/usr/src/"
     wget_and_untar
 
-
+    echo "Log: (umikaze): am335x pru support"
 	wget https://github.com/beagleboard/am335x_pru_package/archive/master.zip
 	unzip master.zip
 
+    echo "Log: (umikaze): pasm compiler"
 	# install pasm PRU compiler
 	mkdir /usr/include/pruss
 	cd am335x_pru_package-master/
@@ -123,9 +124,11 @@ install_redeem_src_pkgs () {
 	chmod 555 /usr/include/pruss/*
 	cd pru_sw/app_loader/interface
 
+    echo "Log: (umikaze): cross compile"
 	CROSS_COMPILE= make
 	cp ../lib/* /usr/lib
 
+    echo "Log: (umikaze): ldconfig, source and install"
 	ldconfig
 	cd ../../utils/pasm_source/
 	source linuxbuild
@@ -186,13 +189,6 @@ configure_cpufrequtils () {
 }
 
 install_replicape_dts () {
-
-    # disable any loading of default or universal cape managers on boot
-    sed -i "s/cape_universal=enable/consoleblank=0 fbcon=rotate:1 omap_wdt.nowayout=0/" /boot/uEnv.txt
-
-    # enable PRU access overlay's i/o
-	sed -i 's\uboot_overlay_pru=/lib/firmware/AM335X-PRU-RPROC\#uboot_overlay_pru=/lib/firmware/AM335X-PRU-RPROC\' /boot/uEnv.txt
-	sed -i 's\#uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO\uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO\' /boot/uEnv.txt
 
 	echo "Log: (umikaze) install replicape overlays"
 	git_repo="https://github.com/ThatWileyGuy/bb.org-overlays"
