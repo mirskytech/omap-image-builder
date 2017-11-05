@@ -158,9 +158,10 @@ install_redeem () {
 	make install
 
 	# Make profiles uploadable via Octoprint
-	cp -r configs /etc/redeem
-	cp -r data /etc/redeem
 	touch /etc/redeem/local.cfg
+
+    cp "${OIB_DIR}/target/other/redeem.service" "/lib/systemd/system"
+
 }
 
 install_git_repos () {
