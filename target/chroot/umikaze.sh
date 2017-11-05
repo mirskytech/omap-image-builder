@@ -160,7 +160,7 @@ install_redeem () {
 	# Make profiles uploadable via Octoprint
 	touch /etc/redeem/local.cfg
 
-    cp "${OIB_DIR}/target/other/redeem.service" "/lib/systemd/system"
+#    cp "${OIB_DIR}/target/other/redeem.service" "/lib/systemd/system"
 
 }
 
