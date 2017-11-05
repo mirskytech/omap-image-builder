@@ -109,6 +109,7 @@ install_redeem_src_pkgs () {
     src_url="http://git.ti.com/pru-software-support-package/pru-software-support-package/archive-tarball/v5.1.0"
     target_dir="/usr/src/"
     wget_and_untar
+    mv /usr/src/pru-software-support-package-pru-software-support-package /usr/src/pru-software-support-package
 
     echo "Log: (umikaze): am335x pru support"
 	wget https://github.com/beagleboard/am335x_pru_package/archive/master.zip
