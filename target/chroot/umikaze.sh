@@ -192,7 +192,7 @@ install_replicape_dts () {
 
 	echo "Log: (umikaze) install replicape overlays"
 	git_repo="https://github.com/ThatWileyGuy/bb.org-overlays"
-	git_target_dir="/usr/src"
+	git_target_dir="/usr/src/bb.org-overlays"
 	git_clone
 
 	cd /usr/src/bb.org-overlays
