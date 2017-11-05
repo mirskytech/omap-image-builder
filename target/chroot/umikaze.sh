@@ -149,11 +149,11 @@ install_redeem () {
     echo "Log: (umikaze): installing redeem"
     cd /usr/src/
 	if [ ! -d "redeem" ]; then
-		git clone --no-single-branch --depth 1 https://bitbucket.org/intelligentagent/redeem
+		git clone --no-single-branch --depth 1 https://github.com/intelligent-agent/redeem.git
 	fi
 	cd redeem
 	git pull
-    git checkout staging
+    git checkout develop
 	make install
 
 	# Make profiles uploadable via Octoprint
