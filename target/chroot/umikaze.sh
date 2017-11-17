@@ -99,6 +99,8 @@ install_redeem_deb_pkgs () {
 	python-pip \
 	python-setuptools \
 	python-dev \
+	python-smbus \
+	python-scipy \
 	swig \
 	socat \
 	ti-pru-cgt-installer
@@ -139,7 +141,7 @@ install_redeem_src_pkgs () {
 
 install_redeem_pip_pkgs () {
     echo "Log: (umikaze): installing redeem pip packages"
-    pip install numpy evdev spidev Adafruit_BBIO sympy
+    pip install numpy evdev spidev Adafruit_BBIO sympy docutils sh
 }
 
 install_redeem () {
